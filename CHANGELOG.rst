@@ -2,8 +2,8 @@
 Changelog for package robot_localization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.7.1 (2024-08-29)
+------------------
 * Fix mixing of UTM and catesian transforms with in use_local_catesian mode (`#884 <https://github.com/cra-ros-pkg/robot_localization/issues/884>`_)
 * Spam the logs a little bit less (`#879 <https://github.com/cra-ros-pkg/robot_localization/issues/879>`_)
 * Contributors: JayHerpin, Tim Clephas
