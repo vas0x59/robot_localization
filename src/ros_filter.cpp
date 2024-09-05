@@ -92,6 +92,7 @@ RosFilter<T>::RosFilter(const rclcpp::NodeOptions & options)
   toggled_on_(true),
   two_d_mode_(false),
   use_control_(false),
+  stamped_control_(false),
   disabled_at_startup_(false),
   enabled_(false),
   permit_corrected_publication_(false),
@@ -139,6 +140,7 @@ RosFilter<T>::~RosFilter()
   timer_.reset();
   set_pose_sub_.reset();
   control_sub_.reset();
+  stamped_control_sub_.reset();
   tf_listener_.reset();
   tf_buffer_.reset();
   diagnostic_updater_.reset();
@@ -970,6 +972,7 @@ void RosFilter<T>::loadParams()
   std::vector<double> deceleration_gains;
 
   use_control_ = this->declare_parameter("use_control", false);
+  stamped_control_ = this->declare_parameter("stamped_control", false);
   control_timeout = this->declare_parameter("control_timeout", 0.0);
 
   if (use_control_) {
@@ -1110,6 +1113,7 @@ void RosFilter<T>::loadParams()
       "\nsmooth_lagged_data is " << (smooth_lagged_data_ ? "true" : "false") <<
       "\nhistory_length is " << filter_utilities::toSec(history_length_) <<
       "\nuse_control is " << use_control_ <<
+      "\nstamped_control_is " << stamped_control_ <<
       "\ncontrol_config is " << control_update_vector <<
       "\ncontrol_timeout is " << control_timeout <<
       "\nacceleration_limits are " << acceleration_limits <<
@@ -1781,9 +1785,16 @@ void RosFilter<T>::loadParams()
       acceleration_limits, acceleration_gains, deceleration_limits,
       deceleration_gains);
 
-    control_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-      "cmd_vel", rclcpp::QoS(1),
-      std::bind(&RosFilter<T>::controlCallback, this, std::placeholders::_1));
+    // Select between TwistStamped or Twist control input
+    if(stamped_control_) {
+      stamped_control_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+        "cmd_vel", rclcpp::QoS(1),
+        std::bind(&RosFilter<T>::controlStampedCallback, this, std::placeholders::_1));
+    } else {
+      control_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+        "cmd_vel", rclcpp::QoS(1),
+        std::bind(&RosFilter<T>::controlCallback, this, std::placeholders::_1));
+    }
   }
 
   /* Warn users about:
