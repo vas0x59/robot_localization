@@ -30,6 +30,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <Eigen/Dense>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <utility>
+
 #include <robot_localization/filter_common.hpp>
 #include <robot_localization/filter_utilities.hpp>
 #include <robot_localization/navsat_conversions.hpp>
@@ -43,14 +50,6 @@
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-
-#include <Eigen/Dense>
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
-#include <utility>
 
 using std::placeholders::_1;
 using std::placeholders::_2;
